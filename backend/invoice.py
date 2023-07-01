@@ -1,6 +1,5 @@
 from dotenv.main import load_dotenv
 from utils import get_vendor_name, parse_data, parse_annotations, construct_prompt
-import base64
 import cohere
 import glob
 import os
@@ -22,9 +21,9 @@ test_image_paths = glob.glob(os.path.join(test_image_dir, "*"))
 test_image_paths.sort()
 
 
-def extract_invoice(idx):
+def extract_invoice(file):
     # Get template name by running image classification
-    template = get_vendor_name(test_image_paths[idx])
+    template = get_vendor_name(file)
 
     # Collect raw text, annotation of training data
     texts = parse_data(template)
@@ -34,7 +33,7 @@ def extract_invoice(idx):
     fields = annotations[0].keys()
 
     # # Collect raw text of the document to predict
-    test_text = pytesseract.image_to_string(Image.open(test_image_paths[idx]))
+    test_text = pytesseract.image_to_string(Image.open(file))
 
     prompt = construct_prompt(texts, annotations, fields, test_text)
     response = co.generate(
@@ -43,8 +42,4 @@ def extract_invoice(idx):
         max_tokens=400,
     )
     text = response.generations[0].text
-    print(text)
-
-
-# TODO: Change number corresponding to test_set/image file index to see results
-extract_invoice(0)
+    return text
