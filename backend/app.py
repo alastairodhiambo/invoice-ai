@@ -46,4 +46,5 @@ def extract_invoice(idx):
     print(text)
 
 
-extract_invoice(3)  # TODO:
+# TODO: Change number corresponding to test_set/image file index to see results
+extract_invoice(0)
