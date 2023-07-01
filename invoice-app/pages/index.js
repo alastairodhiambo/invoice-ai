@@ -14,7 +14,7 @@ import { Chart as ChartJS,
 import { AwesomeButton } from 'react-awesome-button';
 import 'react-awesome-button/dist/styles.css';
 import { useState } from 'react';
-
+import { UserData } from '../pages/UserData'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -32,20 +32,25 @@ export default function Home() {
   const [selectedFile, setSelectedFile] = useState(null);
   
   const data = {
-    labels: ['Mon', 'Tue', 'Wed'],
-    datasets: [
-      { 
-        label: '396',
-        data: [3, 6, 9],
-        backgroundColor: 'aqua',
-        borderColor: 'black',
-        borderWidth: 1,
-      }
-    ]
+      labels: UserData.map(o => o.year),
+      datasets: [
+        {
+          label: 'Users Gained',
+          backgroundColor: '#339af0',
+          borderColor: 'rgb(0, 255, 0)',
+          borderWidth: 1,
+          data: UserData.map(o => o.userGain)
+        }
+      ]
   }
 
   const options = {
-
+    plugins: {
+      title: {
+        display: true,
+        text: 'Bar Chart'
+      }
+    }
   }
 
   const handleFileChange = (event) => {
