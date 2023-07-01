@@ -8,8 +8,7 @@ Original file is located at
 """
 
 
-
-#pip install transformers
+# pip install transformers
 import pandas as pd
 from transformers import pipeline
 import os
@@ -20,20 +19,22 @@ token_classifier = pipeline(
     "token-classification", model=model_checkpoint, aggregation_strategy="simple"
 )
 
+
 def split_on_and(input_string):
     split_words = input_string.split('and')
     words_before = split_words[0].strip().split()
     word_before = words_before[-1] if words_before else ''
-    word_after = split_words[1].strip().split()[0] if len(split_words) > 1 else ''
+    word_after = split_words[1].strip().split()[
+        0] if len(split_words) > 1 else ''
     return word_before, word_after
 
 
-def get_highest_objects(string, data,df):
+def get_highest_objects(string, data, df):
     highest_score = -1
     highest_org = None
 
     for item in data:
-        if (item['entity_group'] == 'ORG' or item['entity_group'] == 'PER' )  and item['score'] > highest_score:
+        if (item['entity_group'] == 'ORG' or item['entity_group'] == 'PER') and item['score'] > highest_score:
             highest_score = item['score']
             highest_org = "Place equals " + item['word']
     for item in data:
@@ -46,8 +47,9 @@ def get_highest_objects(string, data,df):
     print(prompt)
     return prompt
 
+
 def prompt(insert_prompt):
-    CODEPAL_API_KEY = 'f796e543-5b48-4476-b8bb-3da3c6e3fee4'
+    CODEPAL_API_KEY = '4c852222-5b95-4656-bfd7-fb0044b4d73f'
     headers = {
         # Already added when you pass json= but not when you pass data=
         # 'Content-Type': 'application/json',
@@ -55,42 +57,33 @@ def prompt(insert_prompt):
     }
     print(headers)
     files = {
-    'language': (None, 'python'),
-    'instructions': (None, insert_prompt),
+        'language': (None, 'python'),
+        'instructions': (None, insert_prompt),
     }
-    response = requests.post('https://api.codepal.ai/v1/code-generator/query', headers=headers, files=files)
+    response = requests.post(
+        'https://api.codepal.ai/v1/code-generator/query', headers=headers, files=files)
     result = response.json()
     print(result)
     return result
 
+
 def write_to_py_file(string):
-  text_file = open("function1.py", "w")
-  n = text_file.write(string)
-  text_file.close()
+    text_file = open("function1.py", "w")
+    n = text_file.write(string)
+    text_file.close()
 
 
 def get_coordinates(string):
     data = token_classifier(string)
     df = pd.read_csv('./Structured_Data.csv')
-    insert_prompt  = get_highest_objects(string, data,df)
+    insert_prompt = get_highest_objects(string, data, df)
     print(insert_prompt)
     run_Prompt = prompt(insert_prompt)
-    resulting_prompt= run_Prompt['result']
+    resulting_prompt = run_Prompt['result']
     write_to_py_file(resulting_prompt)
     from function1 import generated_function
-    x,y  = generated_function(df)
+    x, y = generated_function(df)
     print(x)
     print(y)
 
-
-
-
-
-
-
-
-
-
-
-
-
+    return {"x": x, "y": y}

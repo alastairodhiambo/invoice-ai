@@ -1,8 +1,35 @@
+import requests
+import os
+from transformers import pipeline
+import pandas as pd
 from fastapi import FastAPI, UploadFile
 
 from invoice import extract_invoice
 from to_csv import json_to_csv
 from text2code import get_coordinates
+
+from pydantic import BaseModel
+
+# from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI()
+
+# origins = [
+#     "http://localhost",
+#     "http://localhost:3000",
+# ]
+
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=origins,
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
+
+
+class Item(BaseModel):
+    query: str | None = None
 
 
 app = FastAPI()
@@ -20,14 +47,15 @@ async def create_upload_file(file: UploadFile):
 
     return {"data": data}
 
-@app.post("/process")
-def get_text(input_text: str):
-    # Call the text2code function to process the input_text
-    processed_result = get_coordinates(input_text)
-    
-    # Return the processed result to the frontend
-    return {"processed_result": processed_result}
 
+@app.get("/process")
+async def get_text(string: str):
+    # Call the text2code function to process the input_text
+    processed_result = get_coordinates(string)
+    print(processed_result)
+
+    # Return the processed result to the frontend
+    return processed_result
 
 
 # -*- coding: utf-8 -*-
@@ -40,32 +68,29 @@ Original file is located at
 """
 
 
-
-#pip install transformers
-import pandas as pd
-from transformers import pipeline
-import os
-import requests
+# pip install transformers
 
 model_checkpoint = "huggingface-course/bert-finetuned-ner"
 token_classifier = pipeline(
     "token-classification", model=model_checkpoint, aggregation_strategy="simple"
 )
 
+
 def split_on_and(input_string):
     split_words = input_string.split('and')
     words_before = split_words[0].strip().split()
     word_before = words_before[-1] if words_before else ''
-    word_after = split_words[1].strip().split()[0] if len(split_words) > 1 else ''
+    word_after = split_words[1].strip().split()[
+        0] if len(split_words) > 1 else ''
     return word_before, word_after
 
 
-def get_highest_objects(string, data,df):
+def get_highest_objects(string, data, df):
     highest_score = -1
     highest_org = None
 
     for item in data:
-        if (item['entity_group'] == 'ORG' or item['entity_group'] == 'PER' )  and item['score'] > highest_score:
+        if (item['entity_group'] == 'ORG' or item['entity_group'] == 'PER') and item['score'] > highest_score:
             highest_score = item['score']
             highest_org = "Place equals " + item['word']
     for item in data:
@@ -78,6 +103,7 @@ def get_highest_objects(string, data,df):
     print(prompt)
     return prompt
 
+
 def prompt(insert_prompt):
     CODEPAL_API_KEY = 'f796e543-5b48-4476-b8bb-3da3c6e3fee4'
     headers = {
@@ -87,19 +113,17 @@ def prompt(insert_prompt):
     }
     print(headers)
     files = {
-    'language': (None, 'python'),
-    'instructions': (None, insert_prompt),
+        'language': (None, 'python'),
+        'instructions': (None, insert_prompt),
     }
-    response = requests.post('https://api.codepal.ai/v1/code-generator/query', headers=headers, files=files)
+    response = requests.post(
+        'https://api.codepal.ai/v1/code-generator/query', headers=headers, files=files)
     result = response.json()
     print(result)
     return result
 
+
 def write_to_py_file(string):
-  text_file = open("function1.py", "w")
-  n = text_file.write(string)
-  text_file.close()
-
-
-
-
+    text_file = open("function1.py", "w")
+    n = text_file.write(string)
+    text_file.close()

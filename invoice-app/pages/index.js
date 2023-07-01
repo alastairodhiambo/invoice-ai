@@ -1,57 +1,53 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
-import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS,
-         BarElement,
-         CategoryScale,
-         LinearScale, 
-         Tooltip,
-         Legend
-       } from 'chart.js'
-  
-import { AwesomeButton } from 'react-awesome-button';
-import 'react-awesome-button/dist/styles.css';
-import { useState } from 'react';
-import { UserData } from '../pages/UserData'
-
-const inter = Inter({ subsets: ['latin'] })
-
-ChartJS.register(
+import Head from "next/head";
+import Image from "next/image";
+import { Inter } from "next/font/google";
+import styles from "@/styles/Home.module.css";
+import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
   BarElement,
   CategoryScale,
   LinearScale,
   Tooltip,
-  Legend
-)
+  Legend,
+} from "chart.js";
+
+import { AwesomeButton } from "react-awesome-button";
+import "react-awesome-button/dist/styles.css";
+import { useState } from "react";
+import { UserData } from "../pages/UserData";
+
+const inter = Inter({ subsets: ["latin"] });
+
+ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 //uvicorn main:app --reload
 
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState(null);
-  
+  const [query, setQuery] = useState("");
+
   const data = {
-      labels: UserData.map(o => o.year),
-      datasets: [
-        {
-          label: 'Users Gained',
-          backgroundColor: '#339af0',
-          borderColor: 'rgb(0, 255, 0)',
-          borderWidth: 1,
-          data: UserData.map(o => o.userGain)
-        }
-      ]
-  }
+    labels: UserData.map((o) => o.year),
+    datasets: [
+      {
+        label: "Year Total",
+        backgroundColor: "#339af0",
+        borderColor: "rgb(0, 255, 0)",
+        borderWidth: 1,
+        data: UserData.map((o) => o.userGain),
+      },
+    ],
+  };
 
   const options = {
     plugins: {
       title: {
         display: true,
-        text: 'Bar Chart'
-      }
-    }
-  }
+        text: "Bar Chart",
+      },
+    },
+  };
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -63,18 +59,18 @@ export default function Home() {
 
     if (selectedFile) {
       const formData = new FormData();
-      formData.append('file', selectedFile);
+      formData.append("file", selectedFile);
 
       try {
-        const response = await fetch('http://127.0.0.1:8000/uploadfile/', {
-          method: 'POST',
+        const response = await fetch("http://127.0.0.1:8000/uploadfile/", {
+          method: "POST",
           body: formData,
         });
 
         if (response.ok) {
-          console.log('File uploaded successfully');
+          console.log("File uploaded successfully");
         } else {
-          console.error('File upload failed');
+          console.error("File upload failed");
         }
       } catch (error) {
         console.error(error);
@@ -82,47 +78,99 @@ export default function Home() {
     }
   };
 
+  // const handleQuery = async (event) => {
+  //   event.preventDefault();
+  //   const formData = new FormData();
+  //   formData.append("text", query);
 
-  const handleQuery = async (event) => {
-    event.preventDefault();
-    
-    Result = fetch('/process', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ input_text: inputText }),
-    })
-      .then(response => response.json())
-      .then(data => {
-        // Process the response data received from the API
-        const processedResult = data.processed_result;
-        console.log(processedResult);
-        // Do something with the processed result
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        // Handle any errors that occurred during the request
-      });
-  }
+  //   try {
+  //     const response = await fetch("http://127.0.0.1:8000/process", {
+  //       method: "POST",
+  //       // headers: {
+  //       //   "Content-Type": "application.json",
+  //       // },
+  //       body: formData,
+  //     });
+
+  //     // if (response.ok) {
+  //     //   console.log("File uploaded successfully");
+  //     // } else {
+  //     //   console.error("File upload failed");
+  //     // }
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
+  const handleQuery = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/process?string=${encodeURIComponent(query)}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Something went wrong");
+      }
+
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleInputChange = (event) => {
+    setQuery(event.target.value);
+  };
 
   return (
-    <div style={{display: "flex", flexDirection: 'column'}}>
-      <h1 style={{fontFamily:"Lucida Console", marginTop: "10vh", marginLeft: "10vw"}}>
+    <div style={{ display: "flex", flexDirection: "column" }}>
+      <h1
+        style={{
+          fontFamily: "Lucida Console",
+          marginTop: "10vh",
+          marginLeft: "10vw",
+        }}
+      >
         Hello, Welcome to Invoice AI
       </h1>
-      <input style={{marginTop: '5vh', marginLeft: "10vw", borderRadius: "3px", width: "80%", height: "5vh", fontSize: "1.5rem", paddingLeft: "1%", color: "grey"}}/>
-      <AwesomeButton onSubmit={handleQuery} style={{width: "10%", marginLeft: "10%", marginTop: "1%"}} type="primary">Submit</AwesomeButton>
-      <form onSubmit={handleSubmit} style={{marginTop: "2%"}}>
-        <AwesomeButton style={{width: "10%", marginLeft: "10%", marginRight: "2%" }} type="primary">Upload</AwesomeButton>
+
+      <input
+        style={{
+          marginTop: "5vh",
+          marginLeft: "10vw",
+          borderRadius: "3px",
+          width: "80%",
+          height: "5vh",
+          fontSize: "1.5rem",
+          paddingLeft: "1%",
+          color: "grey",
+        }}
+        type="text"
+        name="query"
+        onChange={handleInputChange}
+      />
+      <AwesomeButton
+        onPress={handleQuery}
+        style={{ width: "10%", marginLeft: "10%", marginTop: "1%" }}
+        type="primary"
+      >
+        Submit
+      </AwesomeButton>
+
+      <form onSubmit={handleSubmit} style={{ marginTop: "2%" }}>
+        <AwesomeButton
+          style={{ width: "10%", marginLeft: "10%", marginRight: "2%" }}
+          type="primary"
+        >
+          Upload
+        </AwesomeButton>
         <input type="file" onChange={handleFileChange} />
       </form>
-      <div style={{width: "50%", marginLeft: "25%"}}>
-      <Bar
-        data={data}
-        options={options}
-      ></Bar>
+      <div style={{ width: "50%", marginLeft: "25%" }}>
+        <Bar data={data} options={options}></Bar>
       </div>
     </div>
-  )
+  );
 }
