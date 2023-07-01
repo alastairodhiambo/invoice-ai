@@ -9,7 +9,7 @@ Original file is located at
 
 
 
-pip install transformers
+#pip install transformers
 import pandas as pd
 from transformers import pipeline
 import os
@@ -47,7 +47,7 @@ def get_highest_objects(string, data,df):
     return prompt
 
 def prompt(insert_prompt):
-    CODEPAL_API_KEY = 'fe6e0d45-bfb2-4596-9c4b-afe294149864'
+    CODEPAL_API_KEY = 'f796e543-5b48-4476-b8bb-3da3c6e3fee4'
     headers = {
         # Already added when you pass json= but not when you pass data=
         # 'Content-Type': 'application/json',
@@ -70,7 +70,7 @@ def write_to_py_file(string):
 
 string = "Plot Date and Total I spent at Walgreens?"
 data = token_classifier(string)
-df = pd.read_csv('/content/Structured_Data.csv')
+df = pd.read_csv('./Structured_Data.csv')
 insert_prompt  = get_highest_objects(string, data,df)
 print(insert_prompt)
 run_Prompt = prompt(insert_prompt)
