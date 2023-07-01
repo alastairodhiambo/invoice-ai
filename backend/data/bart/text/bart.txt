@@ -1,26 +1,28 @@
-TVM No. 5315
+TVN No. : 5315
 BART
-San Francisco Int'l Airport
-497 North Link Road
 
-DATE: 07/21/18
+San Francisco Int'l Airp
+ort
+
+497 North Link Road
+DATE: Uf/21/18
+
 TIME: 10:11 PM
 
 MasterCard
-CreditCard Sale
+Credit Card Sale
 
-CARD NO. 5052
-AMOUNT NO 20.00
-AUTH # 284508
-REF # 166337
+CARD NO- 5052
+ANOUNT $ 20_00
+AUTH. t 284508
+REF. tt 166337
+ANOUNT AUTHORIZED 20.00
+TRANS. INFU gm. = §
 
-AMOUNT AUTHPRIZED 20.00
-
-TRANS INFO QTY $
-TKT/S REQ 1 20.00
+TKT/S R 1 20.00
 TKT/S ISSUED 1 20.00
 BA SN 00889196
+TRAN ID 8 204845
 
-TRAN ID # 204845
+thanks for riding BART.
 
-Thanks for riding BART.

@@ -1,35 +1,49 @@
-import cohere
-import base64
-import os
-import glob
-
 from dotenv.main import load_dotenv
+from utils import get_vendor_name, parse_data, parse_annotations, construct_prompt
+import base64
+import cohere
+import glob
+import os
+from PIL import Image
+import pytesseract
 
 load_dotenv()
 
 api_key = os.environ.get("COHERE_API_KEY")
+co = cohere.Client(api_key)
 
-# test_pdf_dir = os.path.join("test_set, pdf")
-# test_image_dir = os.path.join("test_set", "images")
+dir = "test_set"
+test_pdf_dir = os.path.join(dir, "pdf")
+test_image_dir = os.path.join(dir, "images")
+test_invoices = glob.glob(os.path.join(test_pdf_dir, "*"))
+test_invoices.sort()
 
-# test_invoices = glob.glob(os.path.join(test_pdf_dir, "*"))
-# test_invoices.sort()
-
-# test_image_list = []
-# test_image_paths = []
-
-# test_invoices = glob.glob(os.path.join(test_pdf_dir, "*"))
-# test_invoices.sort()
+test_image_paths = glob.glob(os.path.join(test_image_dir, "*"))
+test_image_paths.sort()
 
 
-# for test_invoice in test_invoices:
-#     base_name = os.path.basename(test_invoice)
-#     file_name = base_name.split(".")[0]
+def extract_invoice(idx):
+    # Get template name by running image classification
+    template = get_vendor_name(test_image_paths[idx])
 
-#     # Convert first page of uploaded pdf to image
-#     image_path = os.path.join(test_image_dir, f"{file_name}.jpg")
-#     with open(image_path, "rb") as f:
-#         image_content = f.read()
-#         encoded = base64.b64encode(image_content).decode()
-#         test_image_list.append(f"data:image/jpeg;base64,{encoded}")
-#     test_image_paths.append(image_path)
+    # Collect raw text, annotation of training data
+    texts = parse_data(template)
+    annotations = parse_annotations(template)
+
+    # Collect all fields to extract
+    fields = annotations[0].keys()
+
+    # # Collect raw text of the document to predict
+    test_text = pytesseract.image_to_string(Image.open(test_image_paths[idx]))
+
+    prompt = construct_prompt(texts, annotations, fields, test_text)
+    response = co.generate(
+        model="command",
+        prompt=prompt,
+        max_tokens=400,
+    )
+    text = response.generations[0].text
+    print(text)
+
+
+extract_invoice(3)  # TODO:

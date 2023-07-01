@@ -1,0 +1,6 @@
+cohere
+torch
+torchvision
+numpy
+pillow
+pdf2image
