@@ -70,7 +70,7 @@ def write_to_py_file(string):
 
 string = "Plot Date and Total I spent at Walgreens?"
 data = token_classifier(string)
-df = pd.read_csv('/content/Structured Data.csv')
+df = pd.read_csv('/content/Structured_Data.csv')
 insert_prompt  = get_highest_objects(string, data,df)
 print(insert_prompt)
 run_Prompt = prompt(insert_prompt)
