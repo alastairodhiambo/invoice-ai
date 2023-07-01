@@ -2,6 +2,8 @@ from fastapi import FastAPI, UploadFile
 
 from invoice import extract_invoice
 from to_csv import json_to_csv
+from text2code import get_coordinates
+
 
 app = FastAPI()
 
@@ -17,6 +19,15 @@ async def create_upload_file(file: UploadFile):
     json_to_csv(data)
 
     return {"data": data}
+
+@app.post("/process")
+def get_text(input_text: str):
+    # Call the text2code function to process the input_text
+    processed_result = get_coordinates(input_text)
+    
+    # Return the processed result to the frontend
+    return {"processed_result": processed_result}
+
 
 
 # -*- coding: utf-8 -*-
@@ -89,19 +100,6 @@ def write_to_py_file(string):
   n = text_file.write(string)
   text_file.close()
 
-string = "Plot Date and Total I spent at Walgreens?"
-data = token_classifier(string)
-df = pd.read_csv('./Structured_Data.csv')
-insert_prompt  = get_highest_objects(string, data,df)
-print(insert_prompt)
-run_Prompt = prompt(insert_prompt)
-resulting_prompt= run_Prompt['result']
-write_to_py_file(resulting_prompt)
-from function1 import generated_function
-x,y  = generated_function(df)
-
-print(x)
-print(y)
 
 
 

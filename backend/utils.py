@@ -17,6 +17,8 @@ import torchvision.models as models
 import torchvision.transforms as transforms
 from torch.autograd import Variable
 
+
+
 # Load the pretrained model
 model = models.resnet18()
 # Use the model object to select the desired layer

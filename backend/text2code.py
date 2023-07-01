@@ -68,18 +68,19 @@ def write_to_py_file(string):
   n = text_file.write(string)
   text_file.close()
 
-string = "Plot Date and Total I spent at Walgreens?"
-data = token_classifier(string)
-df = pd.read_csv('./Structured_Data.csv')
-insert_prompt  = get_highest_objects(string, data,df)
-print(insert_prompt)
-run_Prompt = prompt(insert_prompt)
-resulting_prompt= run_Prompt['result']
-write_to_py_file(resulting_prompt)
-from function1 import generated_function
-x,y  = generated_function(df)
-print(x)
-print(y)
+
+def get_coordinates(string):
+    data = token_classifier(string)
+    df = pd.read_csv('./Structured_Data.csv')
+    insert_prompt  = get_highest_objects(string, data,df)
+    print(insert_prompt)
+    run_Prompt = prompt(insert_prompt)
+    resulting_prompt= run_Prompt['result']
+    write_to_py_file(resulting_prompt)
+    from function1 import generated_function
+    x,y  = generated_function(df)
+    print(x)
+    print(y)
 
 
 
