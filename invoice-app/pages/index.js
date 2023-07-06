@@ -1,7 +1,6 @@
-import Head from "next/head";
-import Image from "next/image";
+import { useState } from "react";
 import { Inter } from "next/font/google";
-import styles from "@/styles/Home.module.css";
+import { AwesomeButton } from "react-awesome-button";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -12,12 +11,9 @@ import {
   Legend,
 } from "chart.js";
 
-import { AwesomeButton } from "react-awesome-button";
 import "react-awesome-button/dist/styles.css";
-import { useState } from "react";
-import { UserData } from "../pages/UserData";
 
-const inter = Inter({ subsets: ["latin"] });
+import { UserData } from "../pages/UserData";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -78,43 +74,22 @@ export default function Home() {
     }
   };
 
-  // const handleQuery = async (event) => {
-  //   event.preventDefault();
-  //   const formData = new FormData();
-  //   formData.append("text", query);
+  const handleQuery = async (event) => {
+    event.preventDefault();
 
-  //   try {
-  //     const response = await fetch("http://127.0.0.1:8000/process", {
-  //       method: "POST",
-  //       // headers: {
-  //       //   "Content-Type": "application.json",
-  //       // },
-  //       body: formData,
-  //     });
-
-  //     // if (response.ok) {
-  //     //   console.log("File uploaded successfully");
-  //     // } else {
-  //     //   console.error("File upload failed");
-  //     // }
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-
-  const handleQuery = async (e) => {
-    e.preventDefault();
     try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/process?string=${encodeURIComponent(query)}`
-      );
+      const response = await fetch("http://127.0.0.1:8000/process", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query: query }),
+      });
 
-      if (!response.ok) {
-        throw new Error("Something went wrong");
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
       }
-
-      const data = await response.json();
-      console.log(data);
     } catch (error) {
       console.error(error);
     }
